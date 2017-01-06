@@ -1,3 +1,6 @@
+import time
+import datetime
+
 tablTheme = []
 tablQuest = []
 tablQcm = []
@@ -10,7 +13,7 @@ def fetch():
     with open("questions.qs","r") as qs:
         # Lit le fichier questions.qs ligne par ligne
         for line in qs:
-            # line = line.rstrip()
+            line = line.rstrip()
             # a chaque fois qu'une ligne est stockee dans un tableau, les deux autres tableaux recoivent une case vide
             # si la ligne lue commence par ##, elle est stockee dans le tableau theme
             if line.startswith("##"):
@@ -53,12 +56,34 @@ def eval():
             # on affiche le contenu de l'index qcm
             print tablQcm[i]
             # si i a atteint la longueur du tableau OU si l'index suivant contient une question
-            if i == len(tablQuest) - 1 or tablQuest[i+1] != "" :
+            if i == len(tablQuest) - 1 or tablQuest[i+1] != "" or tablTheme[i+1] != "":
                 # on demande la reponse au qcm
                 rep= raw_input("Ecrivez la bonne reponse. ")
                 # la reponse est stockee dans le tableau reponse
                 tablRep.append(rep)
 
+def write():
+    with open("index.html","w+") as f:
+        i = 0
+        j = 0
+        def debTheme() : f.write('<article>\r\n<h3>' + tablTheme[i] + '</h3>\r\n')
+        def question() : f.write('<section>\r\n<h4><span>Question '+ str(j+1) +'</span> ' + tablQuest[i] + ' <span>' + time.strftime("%H h %M min %S sec") + '</span></h4>\r\n')
+        def reponse() : f.write('<p>' + tablRep[j] + '</p>\r\n</section>\r\n\n')
+        def finTheme() : f.write('</article>\r\n')
+        f.write('<html>\r\n<head>\r\n<meta http-equiv="content-type" content="text/html; charset=utf-8" />\r\n<title>evaluations du 03 janvier 2017 - Lunel</title>\r\n<link rel="stylesheet" type="text/css" href="style.css">\r\n</head>\r\n\n<body>\r\n<h1>evaluations du 03 janvier 2017 - Lunel</h1>\r\n<h2>Ludovic Castro</h2>\r\n')
+        for i in range(len(tablQuest)):
+            if tablTheme[i] != "":
+                if j != 0:
+                    finTheme()
+                debTheme()
+            elif tablQuest[i] != "":
+                question()
+                reponse()
+                if j < len(tablRep) - 1:
+                    j += 1
+        finTheme()
+        f.write('</body>\r\n</html>')
+
 fetch()
 eval()
-
+write()
